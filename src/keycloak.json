@@ -1,6 +1,6 @@
 {
   "realm": "Fullstack",
-  "auth-server-url": "https://auth.localtest.me/",
+  "auth-server-url": "https://vm.cloud.cbh.kth.se:2521",
   "ssl-required": "external",
   "resource": "fullstack-frontend",
   "clientId": "fullstack-frontend",
