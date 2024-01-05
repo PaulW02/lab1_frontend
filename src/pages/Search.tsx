@@ -12,10 +12,10 @@ import {
     TableCell,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { PatientService } from '../rest/PatientService'; // Assuming you have a PatientService
 import { useNavigate } from 'react-router-dom';
 import '../css/index.css';
-
+import {SearchService} from "../rest/SearchService"
+import { userService } from "../rest/UserService";
 function Search() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -24,8 +24,8 @@ function Search() {
     const role = localStorage.getItem('role');
 
     useEffect(() => {
-        if (role == null || role === 'Patient') {
-            navigate('/Home');
+        if (userService.isPatient() || !userService.isLoggedIn()){
+            navigate("/Home")
         } else {
             // Fetch initial patient data or perform any initial actions here
         }
@@ -33,9 +33,10 @@ function Search() {
 
     const handleSearch = async () => {
         try {
-            const result = await SearchService.searchPatient(firstName, lastName);
+            const result = await SearchService.searchPatient(firstName, firstName, firstName);
 
             if (result.ok) {
+                console.log(result.response);
                 setPatients(result.response);
             } else {
                 console.log('No patients found');
@@ -45,7 +46,7 @@ function Search() {
         }
     };
 
-    const handleRowClick = (patientId) => {
+    const handleRowClick = (patientId: any) => {
         navigate(`/patient/${patientId}/details`);
     };
 
@@ -88,7 +89,7 @@ function Search() {
                     </TableHead>
                     <TableBody>
                         {patients.length > 0 ? (
-                            patients.map((patient) => (
+                            patients.map((patient: any) => (
                                 <TableRow
                                     key={patient.id}
                                     component="tr"

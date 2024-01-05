@@ -1,7 +1,8 @@
 import {apiRequests as apiRequest, apiRequests} from "./ApiRequests";
+import { userService } from "../rest/UserService";
 
 
-const serverUrl = "http://localhost:5003";
+const serverUrl = "http://localhost:5005";
 export const PatientService = {
     searchPatient,
     getPatientInfo,
@@ -21,23 +22,23 @@ async function getEncounterDetails(encounterId) {
 
     const url = `${serverUrl}/encounter/${encounterId}/`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to get encounter details"}
     }
-
-    return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function getObservationsByEncounter(encounterId) {
     const url = `${serverUrl}/encounter/${encounterId}/observations`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to get observations by encounter"}
     }
-
-    return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function searchPatient (firstName, lastName) {
@@ -45,39 +46,43 @@ async function searchPatient (firstName, lastName) {
     const url = `${serverUrl}/patient/search?firstName=${firstName}&lastName=${lastName}`;
 
   //  let body = JSON.stringify({firstName: firstName, lastName : lastName});
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to search patient"}
     }
-        return { ok: true, status: response.status, response: await response.json() };
 }
 async function getPatientDetails(id)
 {
     const url = `${serverUrl}/patient/${id}/details`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to get patient details"}
     }
-    return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function getPatientInfo(userId) {
     const url = `${serverUrl}/patient/profile?userId=${userId}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to get patient info"}
     }
-    return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function getAllPatients() {
     const url = `${serverUrl}/patient/`;
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Failed to get all patients"}
     }
-    return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function addObservation(data) {
@@ -92,7 +97,7 @@ async function addObservation(data) {
 }
 
 async function addEncounter(data) {
-    let url = serverUrl + `/encounter`;
+    let url = serverUrl + `/encounter/`;
     let body = JSON.stringify(data);
     let response = await apiRequests.sendRequest(url, apiRequests.postRequest(body))
     if (response.ok) {
@@ -114,11 +119,11 @@ async function addCondition(data) {
 }
 async function getPatientInfoById()
 {
-    const id = localStorage.getItem("userId");
+    const id = userService.getSub();
     const url = `${serverUrl}/patient/user/${id}`;
-    const response = await fetch(url);
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
-    return { ok: true, status: response.status, response: await response.json() };
+    return { ok: true, status: response.status, response: response.response };
 }

@@ -11,9 +11,12 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import PatientDetails from "./pages/PatientDetail";
 import Search from "./pages/Search";
+//import { ReactKeycloakProvider } from "@react-keycloak/web";
+//import keycloak from "./keycloak"
 
 function App() {
     return (
+        //<ReactKeycloakProvider authClient={keycloak}>
         <BrowserRouter>
             <Header/>
             <Routes>
@@ -30,6 +33,7 @@ function App() {
 
             </Routes>
         </BrowserRouter>
+        //</ReactKeycloakProvider>
     );
 }
 

@@ -1,7 +1,7 @@
 import {apiRequests as apiRequest, apiRequests} from "./ApiRequests";
 
 
-const serverUrl = "http://localhost:5002";
+const serverUrl = "http://localhost:5005";
 export const MessageService = {
     sendMessage,
     getMessagesByUser
