@@ -2,6 +2,8 @@ import React, {Fragment, useEffect, useState} from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { userService } from './rest/UserService';
+
 
 const user = {
     name: 'Tom Cook',
@@ -12,8 +14,7 @@ const user = {
 
 const navigation = {
     common: [
-        { name: 'Login', href: '/Login', current: false },
-        { name: 'Sign up', href: '/Signup', current: false },
+        { name: 'Home', href: '/Home', current: false },
     ],
     patient: [
         { name: 'Home', href: '/Home', current: false },
@@ -27,12 +28,14 @@ const navigation = {
         { name: 'See Messages', href: '/Messages', current: false },
         { name: 'Add Note', href: '/AddNote', current: false },
         { name: 'Get Patient Info', href: '/GetPatient', current: false },
+        { name: 'Search Patients', href: '/Search', current: false },
     ],
     employee: [
         { name: 'Home', href: '/Home', current: false },
         { name: 'Send Message', href: '/MessageForm', current: false },
         { name: 'See Messages', href: '/Messages', current: false },
         { name: 'Add Note', href: '/AddNote', current: false },
+        { name: 'Search Patients', href: '/Search', current: false },
     ],
 };
 
@@ -72,11 +75,22 @@ function Header() {
         localStorage.removeItem('userId');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        window.location.href = '/login';
+        userService.doLogout();
     };
 
     const isLoggedIn = userRole.length > 0;
-    const userNavigationOptions = userRole === 'Worker' ? navigation.employee : userRole === 'Doctor' ? navigation.doctor : userRole === 'Patient' ?  navigation.patient : navigation.common;
+    let userNavigationOptions = navigation.common;
+    if (!userService.isLoggedIn()){
+        console.log("IM not logged in")
+        userNavigationOptions = navigation.common;
+    }else if(userService.isDoctor()){
+        userNavigationOptions = navigation.doctor;
+    }else if(userService.isPatient()){
+        userNavigationOptions = navigation.patient;
+    }else if(userService.isEmployee()){
+        userNavigationOptions = navigation.employee;
+    }
+
 
     return (
         <>
@@ -95,7 +109,7 @@ function Header() {
                                     </div>
                                     <div className="hidden md:block">
                                         <div className="ml-10 flex items-baseline space-x-4">
-                                            {userNavigationOptions.map((item) => (
+                                            {userNavigationOptions != null ? userNavigationOptions.map((item) => (
                                                 <Link
                                                     key={item.name}
                                                     to={item.href}
@@ -109,13 +123,13 @@ function Header() {
                                                 >
                                                     {item.name}
                                                 </Link>
-                                            ))}
+                                            )) : (<div></div>)}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="ml-4 flex items-center md:ml-6">
-                                        { isLoggedIn && (
+                                        { userService.isLoggedIn() && (
                                         <>
                                             <button
                                                 type="button"
@@ -145,7 +159,7 @@ function Header() {
                         </div>
                         <Disclosure.Panel className="md:hidden">
                             <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
-                                {userNavigationOptions.map((item) => (
+                                {userNavigationOptions != null ? userNavigationOptions.map((item) => (
                                     <Link
                                         key={item.name}
                                         to={item.href}
@@ -157,7 +171,7 @@ function Header() {
                                     >
                                         {item.name}
                                     </Link>
-                                ))}
+                                )) : (<div></div>)}
                             </div>
 
                             <button

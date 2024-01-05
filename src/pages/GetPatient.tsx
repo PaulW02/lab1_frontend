@@ -14,6 +14,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { PatientService } from '../rest/PatientService';
 import { useNavigate } from 'react-router-dom';
+import { userService } from "../rest/UserService";
 import "../css/index.css"
 
 
@@ -25,12 +26,13 @@ function GetPatient() {
     const role = localStorage.getItem("role");
 
     useEffect(() => {
-        if (role == null || role == "Patient"){
+        if (userService.isPatient() || !userService.isLoggedIn()){
             navigate("/Home")
         }else {
             const fetchData = async () => {
                 try {
                     const result = await PatientService.getAllPatients();
+
                     setPatients(result.response);
                 } catch (error) {
                     console.error('Error fetching patient details:', error);

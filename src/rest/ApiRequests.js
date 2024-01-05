@@ -1,4 +1,4 @@
-
+import { userService } from "./UserService"
 export const apiRequests = {
     getRequest,
     postRequest,
@@ -10,7 +10,8 @@ export const apiRequests = {
 // Help functions
 function getRequest() {
     let myHeaders = new Headers();
-
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
     return {
         method: 'GET',
         headers: myHeaders,
@@ -21,6 +22,7 @@ function getRequest() {
 function putRequest(json) {
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
 
     return {
         method: 'PUT',
@@ -33,6 +35,7 @@ function putRequest(json) {
 function postRequest(json) {
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
 
     return {
         method: 'POST',
@@ -45,6 +48,7 @@ function postRequest(json) {
 function deleteRequest(json) {
     let myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", `Bearer ${userService.getToken()}`);
 
     if (json === null) {
         return {
@@ -67,6 +71,7 @@ async function sendRequest(url, requestOptions) {
     let response = await fetch(url, requestOptions)
 
     if (response.status === 200 || response.status === 201) {
+        console.log(response)
         let resultJson = await response.json();
         return {ok: true, status: response.status, response: resultJson}
     } else if (response.status === 204) {

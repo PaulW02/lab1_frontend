@@ -15,10 +15,10 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import "../css/index.css"
+import { userService } from "../rest/UserService";
 
 
 const Profile = () => {
-    const id = localStorage.getItem("userId");
     const [patientDetails, setPatientDetails] = useState<any>(null);
     const [encounters, setEncounters] = useState<any>(null);
     const [observations, setObservations] = useState<any>(null);
@@ -27,14 +27,15 @@ const Profile = () => {
     const role = localStorage.getItem("role");
 
     useEffect(() => {
-        if (role == null){
+        if (!userService.isLoggedIn()){
             navigate("/Home")
         }
         const fetchData = async () => {
             try {
-                if (id != null) {
+                if (userService.getSub() != null) {
                     const result = await PatientService.getPatientInfoById();
                     setPatientDetails(result.response);
+                    console.log(patientDetails);
                     setEncounters(result.response.encounters);
                 }
             } catch (error) {
@@ -42,7 +43,7 @@ const Profile = () => {
             }
         };
         fetchData();
-    }, [id]);
+    }, []);
 
     const handleEncounterClick = async (encounter: any) => {
         try {
@@ -58,7 +59,7 @@ const Profile = () => {
     };
 
     if (!patientDetails) {
-        return <p>Loading...</p>;
+        return <p>Loading..</p>;
     }
 
     return (

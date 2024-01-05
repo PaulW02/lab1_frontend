@@ -1,19 +1,35 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import Keycloak from 'keycloak-js';
 import { userService } from "../rest/UserService";
 import { useNavigate } from "react-router-dom";
-import "../css/login.css"
-import "../css/index.css"
+import "../css/login.css";
+import "../css/index.css";
+import jsonFile from "../keycloak.json"
 
 function Login() {
-    const [formData, setFormData] = useState({username: '', password: ''});
+    const [keycloak, setKeycloak] = useState<Keycloak.KeycloakInstance | null>(null);
+    const [authenticated, setAuthenticated] = useState(false);
+    const [formData, setFormData] = useState({ username: '', password: '' });
     const navigate = useNavigate();
-    const username = localStorage.getItem('username')
-    useEffect( () => {
-        if (username != null){
-            navigate("/Home")
-        }
-    }, []);
+    const username = localStorage.getItem('username');
 
+    useEffect(() => {
+        const initKeycloak = async () => {
+            const keycloakInstance = new Keycloak(jsonFile);
+            try {
+                await keycloakInstance.init({
+                    onLoad: 'login-required',
+                    // Add other Keycloak initialization options here
+                });
+                setKeycloak(keycloakInstance);
+                setAuthenticated(true);
+            } catch (error) {
+                console.error('Keycloak initialization error', error);
+            }
+        };
+
+        initKeycloak();
+    }, []);
 
     const handleInputChange = (e: any) => {
         const {name, value} = e.target;
@@ -22,17 +38,40 @@ function Login() {
 
     const handleLogin = async (e: any) => {
         e.preventDefault();
-        userService.loginUser(formData).then(data => {
-            const userObj = data.response;
-            console.log(userObj)
-            if (userObj.id > 0) {
-                localStorage.setItem('userId', userObj.id);
-                localStorage.setItem('username', userObj.email);
-                localStorage.setItem('role', userObj.role)
-                navigate("/Home"); // Navigate to the "/home" route
-            }
+
+        if (!keycloak) {
+            console.error('Keycloak not initialized');
+            return;
+        }
+        await keycloak.init({
+            checkLoginIframe: false, // or true depending on your use case
+            checkLoginIframeInterval: 0, // or adjust the interval
+            // ... other options
         });
+
+        const loginOptions: Keycloak.KeycloakLoginOptions = {
+            loginHint: formData.username, // Use username as the login hint
+            // Add other relevant properties if needed
+        };
+        try {
+
+            await keycloak.login(loginOptions);
+
+            const userProfile = await keycloak.loadUserProfile();
+            if (userProfile != null) {
+
+                localStorage.setItem('userId', userProfile.id != null ? userProfile.id : "");
+                localStorage.setItem('userId', userProfile.username != null ? userProfile.username : "TEST");
+                //localStorage.setItem('username', userProfile.email);
+                //localStorage.setItem('role', userProfile.role);
+                navigate("/Home");
+            }
+        } catch (error) {
+            console.error('Login failed', error);
+            // Handle login failure (e.g., show an error message)
+        }
     };
+
 
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">

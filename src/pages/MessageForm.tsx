@@ -13,11 +13,11 @@ function MessageForm() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userRole == null){
+        if (!userService.isLoggedIn()){
             navigate("/Home")
         }else {
             const fetchRecipients = async () => {
-                if (userRole === 'Patient') {
+                if (userService.isPatient()) {
                     try {
                         const [doctors, employees] = await Promise.all([
                             userService.getAllDoctors(),
@@ -36,7 +36,7 @@ function MessageForm() {
                     } catch (error) {
                         console.error('API request failed:', error);
                     }
-                } else if (userRole === 'Doctor') {
+                } else if (userService.isDoctor()) {
                     try {
                         const [patients, employees, otherDoctors] = await Promise.all([
                             userService.getAllPatients(),
@@ -56,7 +56,7 @@ function MessageForm() {
                     } catch (error) {
                         console.error('API request failed:', error);
                     }
-                } else if (userRole === 'Worker') {
+                } else if (userService.isEmployee()) {
                     try {
                         const [patients, doctors, otherEmployees] = await Promise.all([
                             userService.getAllPatients(),
@@ -89,12 +89,12 @@ function MessageForm() {
         const isoDate = currentDate.toISOString();
 
         // Assuming you have the sender's user ID available
-        const senderUserId = localStorage.getItem('userId');
+        const senderUserId = userService.getSub();
 
         // Here, you can create a message object with the relevant information
         const messageObject = {
             info: message,
-            senderId: parseInt(senderUserId as string),
+            senderId: senderUserId,
             receiverId: recipient, // Use the selected recipient
         };
 

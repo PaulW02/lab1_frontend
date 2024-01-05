@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, TextField, Autocomplete } from "@mui/material";
 import '../css/AddNote.css';
 import { PatientService } from "../rest/PatientService";
+import { userService } from "../rest/UserService";
 import {useNavigate} from "react-router-dom";
 
 function CreatePatientNote() {
@@ -15,7 +16,7 @@ function CreatePatientNote() {
     const role = localStorage.getItem("role");
 
     useEffect(() => {
-        if (role == null || role == "Patient"){
+        if (userService.isPatient() || !userService.isLoggedIn()){
             navigate("/Home")
         }else {
             PatientService.getAllPatients().then(r => {
@@ -136,40 +137,6 @@ function CreatePatientNote() {
                     Add Note
                 </button>
             </form>
-
-
-            <div className="options-container">
-                <button className="option">
-                    <div className="image-wrapper">
-                        <img src="https://hemvalvet.se/wp-content/uploads/2023/11/AD951F4E-B821-4317-8B6F-03ADE30AA679-e1700348200122.png" alt="Profile Image" className="rounded-image">
-                    </div>
-                    <div className="text-content">
-                        <h3>Hyra ut länge</h3>
-                        <p>Hyr ut en månad eller mer.</p>
-                    </div>
-                </button>
-                <button className="option">
-                    <div className="image-wrapper">
-                        <img src="https://hemvalvet.se/wp-content/uploads/2023/12/unnamed-10-e1701765576947.jpg" alt="Profile Image" className="rounded-image">
-                    </div>
-                    <div className="text-content">
-                        <h3>Semesteruthyrning</h3>
-                        <p>Hyr ut ifrån en natt</p>
-                    </div>
-                </button>
-                <button className="option">
-                    <div className="image-wrapper">
-                        <img src="https://hemvalvet.se/wp-content/uploads/2023/12/unnamed-11-e1702153360364.jpg" alt="Profile Image" className="rounded-image">
-                    </div>
-                    <div class="text-content">
-                        <h3>Another Option Title</h3>
-                        <p>Description for the third option goes here.</p>
-                    </div>
-                </button>
-            </div>
-
-
-
         </div>
     );
 }

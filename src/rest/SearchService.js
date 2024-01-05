@@ -1,7 +1,8 @@
 import {apiRequests as apiRequest, apiRequests} from "./ApiRequests";
+import {Error} from "@mui/icons-material";
 
 
-const serverUrl = "http://localhost:8080/search";
+const serverUrl = "http://localhost:5005";
 export const SearchService = {
     searchPatient,
     getAllPatients,
@@ -11,17 +12,19 @@ export const SearchService = {
 
 async function searchPatient(name, condition, encounterDate) {
 
-    const url = `${serverUrl}/patients?name=${name}&condition=${condition}&encounterDate=${encounterDate}`;
+    const url = `${serverUrl}/search/patients?name=${name}&condition=&encounterDate=`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
+    let response = await apiRequests.sendRequest(url, apiRequests.getRequest())
+    if (response.ok) {
+        console.log(response)
+        return {ok: true, status: response.status, response: response.response}
+    } else {
+        return {ok: false, status: response.status, response: "Users not found"}
     }
-        return { ok: true, status: response.status, response: await response.json() };
 }
 
 async function getAllPatients() {
-    const url = `${serverUrl}/patients/`;
+    const url = `${serverUrl}/search/patients/`;
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error('Network response was not ok');
