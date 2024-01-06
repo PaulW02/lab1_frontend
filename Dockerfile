@@ -1,21 +1,13 @@
-FROM node
-# Set the working directory in the container
-WORKDIR /usr/src/app
+FROM node:20.8.0
 
-# Copy package.json and package-lock.json to the working directory
+WORKDIR /app
+
 COPY package*.json ./
 
-# Install project dependencies
 RUN npm install
 
-# Copy the entire project to the working directory
 COPY . .
 
-# Build the React app
-RUN npm run build
-
-# Expose the port that the app will run on
 EXPOSE 3000
 
-# Specify the command to run on container startup
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
